@@ -1,0 +1,44 @@
+from PIL import Image, ImageDraw, ImageFont
+import time
+
+# Путь к изображению галактики
+galaxy_image = "galaxy.png"
+
+# Создаём объект изображения
+galaxy = Image.open(galaxy_image).convert("RGBA")
+width, height = galaxy.size
+
+# Создаём новый холст размером с исходное изображение
+animated_galaxy = Image.new('RGBA', (width, height))
+
+# Получаем объект рисования
+draw = ImageDraw.Draw(animated_galaxy)
+
+# Путь к шрифту
+font_path = "arial.ttf"
+font = ImageFont.truetype(font_path, size=16)
+
+# Количество кадров анимации
+frames = 100
+
+# Создаём кадры анимации
+for i in range(frames):
+    # Вращаем галактику
+    rotated_galaxy = galaxy.rotate(i * 360.0 / frames, expand=1)
+    # Накладываем галактику на холст
+    animated_galaxy.paste(rotated_galaxy, (0, 0), rotated_galaxy)
+    
+    # Рисуем номер кадра
+    draw.text((10, 10), str(i), (255, 255, 255), font=font)
+    
+    # Сохраняем кадр
+    animated_galaxy.save(f"frame_{i:03d}.png")
+    
+    # Очищаем холст для следующего кадра
+    draw.rectangle([(0, 0), (width, height)], fill=(0, 0, 0, 0))
+    
+    # Ожидаем некоторое время для плавности анимации
+    time.sleep(0.05)
+
+# Сохраняем анимацию в формате GIF
+animated_galaxy.save('galaxy_animation.gif', save_all=True, append_images=True, optimize=False, duration=100, loop=0)
